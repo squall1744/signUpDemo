@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>Document</title>
+  <style>
+    body {
+      height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      flex-direction: column;
+    }
+    
+    form {
+      border: 1px solid #666;
+    }
+
+    form div {
+      padding: 5px;
+    }
+
+    form div label {
+      display: inline-block;
+      width: 4em;
+    }
+  </style>
+</head>
+<body>
+  <h1>注册</h1>
+  <form id="signUpForm">
+    <div>
+      <label for="email">邮箱</label>
+      <input type="text" name="email">
+      <span class="error"></span>
+    </div>
+    <div>
+      <label for="password">密码</label>
+      <input type="password" name="password">
+      <span class="error"></span>
+    </div>
+    <div>
+      <label for="password_confirmation">确认密码</label>
+      <input type="password" name="password_confirmation">
+      <span class="error"></span>
+    </div>
+    <div>
+      <input type="submit" value="注册">
+    </div>
+  </form>
+  <script src="//cdn.bootcss.com/jquery/3.3.1/jquery.min.js"></script>
+  <script>
+    let hash = {}
+
+    /*绑定提交事件*/
+    $('#signUpForm').on('submit', e => {
+      e.preventDefault()
+
+      //将获取邮箱及密码和确认密码的值, 并保存到hash里面
+      let need = ['email', 'password', 'password_confirmation']
+      need.forEach( item => {
+        $('#signUpForm').find(`[name=${item}]`).siblings('.error').text('')
+        let value = $('#signUpForm').find(`[name=${item}]`).val()
+        hash[item] = value
+      })
+      /*判断邮箱、密码及确认密码是否已经填写, 若没有填写则提示填写*/
+      if(hash['email'] === '') {
+        $('#signUpForm').find(`[name="email"]`).siblings('.error').text(`请输入邮箱`)
+        return
+      }
+      if(hash['password'] === '') {
+        $('#signUpForm').find(`[name="password"]`).siblings('.error').text(`请输入密码`)
+        return
+      }
+      if(hash['password_confirmation'] === '') {
+        $('#signUpForm').find(`[name="password_confirmation"]`).siblings('.error').text(`请确认密码`)
+        return
+      }
+      if(hash['password'] !== hash['password_confirmation']) {
+        $('#signUpForm').find(`[name="password_confirmation"]`).siblings('.error').text(`密码不一致`)
+        return
+      }
+      /*发送post请求, 并把保存账号密码的hash传给后端服务器*/                
+      $.post('/sign_up', hash).then((response) => {
+      }, (r) => {
+        let {errors} = r.responseJSON
+        if(errors.email && errors.email=== 'invalid') {
+          alert('邮箱输错了')
+        }
+      })
+    })
+  </script>
+</body>
+</html>

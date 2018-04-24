@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>Document</title>
+  <style>
+    body {
+      height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      flex-direction: column;
+    }
+    
+    form {
+      border: 1px solid #666;
+    }
+
+    form div {
+      padding: 5px;
+    }
+
+    form div label {
+      display: inline-block;
+      width: 4em;
+    }
+  </style>
+</head>
+<body>
+  <h1>登陆</h1>
+  <form id="signInForm">
+    <div>
+      <label for="email">邮箱</label>
+      <input type="text" name="email">
+      <span class="error"></span>
+    </div>
+    <div>
+      <label for="password">密码</label>
+      <input type="password" name="password">
+      <span class="error"></span>
+    </div>
+    <div>
+      <input type="submit" value="登陆">
+    </div>
+  </form>
+  <script src="//cdn.bootcss.com/jquery/3.3.1/jquery.min.js"></script>
+  <script>
+    let hash = {}
+    $('#signInForm').on('submit', e => {
+      e.preventDefault()
+      let need = ['email', 'password']
+      need.forEach( item => {
+        $('#signInForm').find(`[name=${item}]`).siblings('.error').text('')
+        let value = $('#signInForm').find(`[name=${item}]`).val()
+        hash[item] = value
+      })
+      if(hash['email'] === '') {
+        $('#signInForm').find(`[name="email"]`).siblings('.error').text(`请输入邮箱`)
+        return
+      }
+      if(hash['password'] === '') {
+        $('#signInForm').find(`[name="password"]`).siblings('.error').text(`请输入密码`)
+        return
+      }
+            
+      $.post('/sign_in', hash).then((response) => {
+        window.location.href = '/'
+      }, (r) => {
+          alert('登陆错误')
+      })
+    })
+  </script>
+</body>
+</html>
